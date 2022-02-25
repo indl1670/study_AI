@@ -281,33 +281,27 @@ def num4(json_path, out_path):
 
 def num5(json_path, img_path, out_path):
     json_list = os.listdir(json_path)
-    trn_img = []
+    img_list = os.listdir(img_path)
+    img_list = os.listdir(img_path)
+    all_img = []
+    use_img = []
 
     for jl in json_list:
-        img_name = []
-        with open(json_path + jl, 'r', encoding='UTF-8') as f:
+        with open(json_path + jl, encoding="utf8") as f:
             data = json.load(f)
             
+            for a in data["images"]:
+                all_img.append(a["file_name"])
             
-            # 라벨링이 있는 이미지 파일 명 저장
-            for a in data['images']:
-                for b in data['annotations']:
-                    if a['id'] == b['image_id']:
-                        img_name.append(a['file_name'])
-            img_name = set(img_name)
-            
-        trn_img.extend(img_name)
-     
-    print("Labelled images number: ", len(trn_img))
+    use_img = list(set(all_img) & set(img_list))
+    print("Total labelled images number: ", len(use_img))
 
+    file_list = os.listdir(img_path)
 
-    img_list = os.listdir(img_path)
-
-    for i in range(len(trn_img)):
-        if trn_img[i] in img_list:
-            src = img_path + trn_img[i]
+    for i in range(len(use_img)):
+        if use_img[i] in file_list:
+            src = img_path + use_img[i]
             shutil.copy2(src, out_path)
-    print("Done!")
           
 def num6(json_path):
     json_list = os.listdir(json_path)
