@@ -302,7 +302,8 @@ def num5(json_path, img_path, out_path):
         if use_img[i] in file_list:
             src = img_path + use_img[i]
             shutil.copy2(src, out_path)
-          
+     print("Done!")
+    
 def num6(json_path):
     json_list = os.listdir(json_path)
 
