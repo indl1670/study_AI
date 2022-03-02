@@ -135,66 +135,96 @@ def num3_2(json_path, out_path):
     licenses["id"] = 1
     licenses["url"] = None
     licenses["name"] = None
-
+    categories=[
+        {
+            "id": 1,
+            "name": "경계석",
+            "subcategory": ""
+        },
+        {
+            "id": 2,
+            "name": "측구",
+            "subcategory": ""
+        },
+        {
+            "id": 3,
+            "name": "맨홀",
+            "subcategory": ""
+        },
+        {
+            "id": 4,
+            "name": "임시 안전방호벽",
+            "subcategory": ""
+        },
+        {
+            "id": 5,
+            "name": "점자 블럭",
+            "subcategory": ""
+        },
+        {
+            "id": 6,
+            "name": "보도블럭 파손",
+            "subcategory": ""
+        },
+        {
+            "id": 7,
+            "name": "간이 부분 경사로",
+            "subcategory": ""
+        }
+    ]
+    
     images = "{}"
     annotations = "{}"
-    categories = "{}"
+
     
     coco_group["info"] = info
     coco_group["licenses"] = [licenses]
-    coco_group["categories"] = [categories]
+    coco_group["categories"] = categories
     coco_group["images"] = [images]
     coco_group["annotations"] = [annotations]
 
     json_list = os.listdir(json_path)
     img_list = []
     ann_list = []
-    cat_list = []
-    cat_result = []
-    image_index = 1
-
+    
     for jl in json_list:
-        ann_id_index = 1
+        
         print(jl)
         with open(json_path + jl, 'r', encoding='utf8') as f:
             data = json.load(f)
-            
-            for cl in data["categories"]:
-                cat_list.append(cl)
-                
-            for a in data["images"]:
-                a["id"] = image_index
-                image_index = image_index + 1
-            
-            for b in data["images"]:
-                for c in data["annotations"]:
-                    if b["file_name"] == c["image_id"]:
-                        c["image_id"] = b["id"]
                         
             for c in data['images']:
                 img_list.append(c)        
                 
             for d in data['annotations']:
                 ann_list.append(d)
-    
-    cat_result = list(map(dict, collections.OrderedDict.fromkeys(tuple(sorted(d.items())) for d in cat_list)))
-    categories=sorted(cat_result, key=lambda k: k['id'])
+
     images=img_list
     annotations=ann_list
-
-    coco_group["categories"] = categories
     print("coco categories part complete.")
     
+    image_index = 1
+    ann_id_index = 1
     coco_group["images"] = images
+    for g in coco_group["images"]:
+        g["id"] = image_index
+        print(g["id"])
+        image_index = image_index + 1
     print("coco images part complete.")
 
     coco_group["annotations"] = annotations 
     for e in coco_group["annotations"]:
         e["id"] = ann_id_index
         ann_id_index = ann_id_index + 1
+        print(ann_id_index)
         
     print("coco annotations part complete.")              
 
+    for a in coco_group["images"]:
+        for b in coco_group["annotations"]:
+            if a["file_name"] == b["image_id"]:
+                b["image_id"] = a["id"]
+                
     with open(out_path + "result.json", 'w+', encoding='utf8') as make_file:
             json.dump(coco_group, make_file, ensure_ascii=False, indent="\t")
     print("Done!")
@@ -302,8 +332,7 @@ def num5(json_path, img_path, out_path):
         if use_img[i] in file_list:
             src = img_path + use_img[i]
             shutil.copy2(src, out_path)
-     print("Done!")
-    
+          
 def num6(json_path):
     json_list = os.listdir(json_path)
 
