@@ -1,8 +1,6 @@
 import os
 import json
 import shutil
-import pandas as pd
-import collections
 from collections import OrderedDict
 
 def num1(json_path, out_path):
@@ -23,8 +21,6 @@ def num1(json_path, out_path):
     for jl in json_list:
         with open(json_path + jl, "r", encoding="utf-8") as f:
             data = json.load(f)
-                
-            
             
             for i in range(len(in_name)):
                 for c in data["categories"]:
@@ -90,6 +86,7 @@ def num2(json_path, out_path):
     print("Done!")     
         
 def num3_1(json_path, out_path):
+    print("Preprocessing start . . .")
     json_list = os.listdir(json_path)
     for jl in json_list:
         with open(json_path + jl, 'r', encoding='utf8') as f:
@@ -102,22 +99,11 @@ def num3_1(json_path, out_path):
                             
         with open(json_path + jl, 'w+', encoding='utf8') as make_file:
             json.dump(data, make_file, ensure_ascii=False, indent="\t")
+    print("Done!")
     num3_2(json_path, out_path)
     
-    for jl in json_list:
-        with open(json_path + jl, 'r', encoding='utf8') as f:
-            data = json.load(f)
-
-            for a in data["images"]:
-                for b in data["annotations"]:
-                    if b["image_id"] == a["file_name"]:
-                        b["image_id"] = a["id"]
-                            
-        with open(json_path + jl, 'w+', encoding='utf8') as make_file:
-            json.dump(data, make_file, ensure_ascii=False, indent="\t")
-    print("Done!")
-    
 def num3_2(json_path, out_path):
+    print("Integrating start . . .")
     coco_group = OrderedDict()
     info = OrderedDict()
     licenses = OrderedDict()
@@ -170,13 +156,22 @@ def num3_2(json_path, out_path):
             "id": 7,
             "name": "간이 부분 경사로",
             "subcategory": ""
+        },
+        {
+            "id": 8,
+            "name": "도로 홀",
+            "subcategory": ""
+        },
+        {
+            "id": 9,
+            "name": "도로 균열",
+            "subcategory": ""
         }
     ]
     
     images = "{}"
     annotations = "{}"
 
-    
     coco_group["info"] = info
     coco_group["licenses"] = [licenses]
     coco_group["categories"] = categories
@@ -199,25 +194,23 @@ def num3_2(json_path, out_path):
             for d in data['annotations']:
                 ann_list.append(d)
 
+    print("coco categories part complete.")
     images=img_list
     annotations=ann_list
-    print("coco categories part complete.")
     
     image_index = 1
     ann_id_index = 1
+    
     coco_group["images"] = images
     for g in coco_group["images"]:
         g["id"] = image_index
-        print(g["id"])
         image_index = image_index + 1
     print("coco images part complete.")
 
     coco_group["annotations"] = annotations 
     for e in coco_group["annotations"]:
         e["id"] = ann_id_index
-        ann_id_index = ann_id_index + 1
-        print(ann_id_index)
-        
+        ann_id_index = ann_id_index + 1        
     print("coco annotations part complete.")              
 
     for a in coco_group["images"]:
@@ -271,7 +264,6 @@ def num4(json_path, out_path):
         image_id = []
         with open(json_path + jl, 'r', encoding='utf8') as f:
             data = json.load(f)
-            # 선택된 카테고리 id값 저장 - category_id
             for a in data['categories']:
                 if a['id'] == rem_num:
                     print("Selected category_name:  ", a['name'])
@@ -332,7 +324,8 @@ def num5(json_path, img_path, out_path):
         if use_img[i] in file_list:
             src = img_path + use_img[i]
             shutil.copy2(src, out_path)
-          
+    print("Done!")
+    
 def num6(json_path):
     json_list = os.listdir(json_path)
 
@@ -348,7 +341,35 @@ def num6(json_path):
         tot_len = tot_len + ann_len[an] 
     print("The number of labels: ", tot_len)
     print("Done!")
-      
+    
+def num7(json_path, out_path):
+    json_list = os.listdir(json_path)
+    for jl in json_list:
+        with open(json_path + jl, "r", encoding="utf8") as f:
+            data = json.load(f)
+
+            for a in data["annotations"]:
+                if a["segmentation"] == []:
+                    x1 = a["bbox"][0]
+                    y1 = a["bbox"][1]
+                    x2 = a["bbox"][2]
+                    y2 = a["bbox"][3]
+                    a["segmentation"] = [[x1,y1,x1,(y1 + y2), (x1 + x2), (y1 + y2), (x1 + x2), y1]]
+                    
+                elif a["bbox"] == []:
+                    a["bbox"] = a["segmentation"][0]
+                    x1 = a["segmentation"][0][0]
+                    y1 = a["segmentation"][0][1]
+                    x2 = a["segmentation"][0][2]
+                    y2 = a["segmentation"][0][3]
+                    a["segmentation"] = [[x1,y1,x1,(y1 + y2), (x1 + x2), (y1 + y2), (x1 + x2), y1]]
+                    
+        with open(out_path + jl, 'w+', encoding='utf8') as make_file:
+                json.dump(data, make_file, ensure_ascii=False, indent="\t")
+        print(jl, "completed")
+        
+    print("Done!")
+    
 def main():
     print("[2022 KST Json Preprocessing]")
     while True:
@@ -380,6 +401,10 @@ def main():
         elif sel_num == 6:
             json_path = input("\nJson path: ")
             num6(json_path)
+        elif sel_num == 7:
+            json_path = input("\nJson path: ")
+            out_path = input("Out json path: ")
+            num7(json_path, out_path)
         else:
             print("\nInvalid input! Select correct number.")
                 
