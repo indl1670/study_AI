@@ -45,11 +45,11 @@ def main():
         train_after, valid = train_test_split(
             train_before, test_size=ratio_valid_adjusted)
 
-        save_coco('train', info, licenses, train_after, filter_annotations(annotations, train_after), categories)
+        save_coco('instances_train2022.json', info, licenses, train_after, filter_annotations(annotations, train_after), categories)
         print("complete train")
-        save_coco('test', info, licenses, test, filter_annotations(annotations, test), categories)
+        save_coco('instances_test2022', info, licenses, test, filter_annotations(annotations, test), categories)
         print("complete test")
-        save_coco('valid', info, licenses, valid, filter_annotations(annotations, valid), categories)
+        save_coco('instances_valid2022', info, licenses, valid, filter_annotations(annotations, valid), categories)
         print("complete valid")
         
         print("Saved {} entries in {} and {} in {} and {} in {}".format(len(train_after), 'train', len(test), 'test', len(valid), 'valid'))
