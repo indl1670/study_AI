@@ -22,7 +22,7 @@ def filter_annotations(annotations, images):
 def main():
     with open(json_path + json_list[0], 'rt', encoding='UTF-8') as annotations:
         coco = json.load(annotations)
-        print("load success")
+        print("Load success")
         info = coco['info']
         licenses = coco['licenses']
         images = coco['images']
