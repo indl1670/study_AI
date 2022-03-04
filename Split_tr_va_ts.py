@@ -20,7 +20,7 @@ def filter_annotations(annotations, images):
     return funcy.lfilter(lambda a: int(a['image_id']) in image_ids, annotations)
 
 def main():
-    with open(json_path + json_list, 'rt', encoding='UTF-8') as annotations:
+    with open(json_path + json_list[0], 'rt', encoding='UTF-8') as annotations:
         coco = json.load(annotations)
         print("load success")
         info = coco['info']
