@@ -127,9 +127,9 @@ def rmbg(json_path, img_path, save_path):
         new_img_array[:,:,:3] = img_array[:,:,:3]
 
         # filtering image by mask(Baclground color - white => to change Transparent background)
-        new_img_array[:,:,0] = new_img_array[:,:,0] * mask + 255
-        new_img_array[:,:,1] = new_img_array[:,:,1] * mask + 255
-        new_img_array[:,:,2] = new_img_array[:,:,2] * mask + 255
+        new_img_array[:,:,0] = new_img_array[:,:,0] * mask
+        new_img_array[:,:,1] = new_img_array[:,:,1] * mask
+        new_img_array[:,:,2] = new_img_array[:,:,2] * mask
         
         # back to Image from numpy
         newIm = Image.fromarray(new_img_array, "RGB")
@@ -147,7 +147,7 @@ def rmbg(json_path, img_path, save_path):
         width, height = img.size
         for y in range(height):
             for x in range(width):
-                if pixdata[x, y] == (255, 255, 255, 255):
+                if pixdata[x, y] == (0, 0, 0, 255):
                     pixdata[x, y] = (255, 255, 255, 0)
 
         img.save(save_path + "//" + jl2+".png", "PNG")
