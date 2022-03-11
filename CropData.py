@@ -116,12 +116,42 @@ def copyji(json_path, json_list, img_path, img_list, save_json, save_img):
     licenses["name"] = None
 
     categories=[
-            {
-                "id": 1,
-                "name": "경계석",
-                "subcategory": ""
-            }
-        ]
+		{
+			"id": 1,
+			"name": "마스크착용",
+			"supercategory": ""
+		},
+		{
+			"id": 2,
+			"name": "마스크미착용",
+			"supercategory": ""
+		},
+		{
+			"id": 3,
+			"name": "번호판(신)",
+			"supercategory": ""
+		},
+		{
+			"id": 4,
+			"name": "번호판(구)",
+			"supercategory": ""
+		},
+		{
+			"id": 5,
+			"name": "번호판(영업용)",
+			"supercategory": ""
+		},
+		{
+			"id": 6,
+			"name": "번호판(전기차)",
+			"supercategory": ""
+		},
+		{
+			"id": 7,
+			"name": "번호판(공사용)",
+			"supercategory": ""
+		}
+	]
     images = "{}"
     annotations = "{}"
 
