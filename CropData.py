@@ -6,6 +6,95 @@ import numpy
 from collections import OrderedDict
 from PIL import Image, ImageDraw
 
+def spcoco(json_path, json_list, save_json):
+    coco_group = OrderedDict()
+    info = OrderedDict()
+    licenses = OrderedDict()
+    categories = OrderedDict()
+    images = OrderedDict()
+    annotations = OrderedDict()
+
+    info["year"] = None
+    info["version"] = None
+    info["description"] = None
+    info["contributor"] = None
+    info["url"] = None
+    info["date_created"] = None
+
+    licenses["id"] = 1
+    licenses["url"] = None
+    licenses["name"] = None
+    categories=[
+		{
+			"id": 1,
+			"name": "마스크착용",
+			"supercategory": ""
+		},
+		{
+			"id": 2,
+			"name": "마스크미착용",
+			"supercategory": ""
+		},
+		{
+			"id": 3,
+			"name": "번호판(신)",
+			"supercategory": ""
+		},
+		{
+			"id": 4,
+			"name": "번호판(구)",
+			"supercategory": ""
+		},
+		{
+			"id": 5,
+			"name": "번호판(영업용)",
+			"supercategory": ""
+		},
+		{
+			"id": 6,
+			"name": "번호판(전기차)",
+			"supercategory": ""
+		},
+		{
+			"id": 7,
+			"name": "번호판(공사용)",
+			"supercategory": ""
+		}
+	]
+
+    images = "{}"
+    annotations = "{}"
+
+    coco_group["info"] = info
+    coco_group["licenses"] = [licenses]
+    coco_group["categories"] = categories
+    coco_group["images"] = [images]
+    coco_group["annotations"] = [annotations]
+
+    for jl in json_list:
+        with open(json_path + "//" + jl, 'r', encoding='utf8') as f:
+            data = json.load(f)
+            
+            for a in data["images"]:
+                for b in data["annotations"]:
+                    if a["id"] == b["image_id"]:
+                        coco_group["images"] = [a]
+                        coco_group["annotations"] = [b]
+                        
+                        with open(save_json + "//" + a["file_name"].rstrip('.jpg') + ".json", 'w+', encoding='utf8') as make_file:
+                            json.dump(coco_group, make_file, ensure_ascii=False, indent="\t")
+                            
+def jpg2png(img_path, img_list, save_img):
+    print("Converting JPG to PNG . . .")
+    img = []
+    for i in img_list:
+        i = i.rstrip(".jpg")
+        img.append(i)
+    for il in img:
+        im = Image.open(img_path + "//" + il + ".jpg").convert('RGB')
+        im.save(save_img + "//" + il + '.png')
+    print("Done!")
+    
 def copyji(json_path, json_list, img_path, img_list, save_json, save_img):
     print("\nData preprocessing . . .")
     coco_group = OrderedDict()
@@ -127,7 +216,7 @@ def rmbg(json_path, img_path, save_path):
         new_img_array[:,:,:3] = img_array[:,:,:3]
 
         # filtering image by mask(Baclground color - white => to change Transparent background)
-        new_img_array[:,:,0] = new_img_array[:,:,0] * mask
+        new_img_array[:,:,0] = new_img_array[:,:,0] * mask 
         new_img_array[:,:,1] = new_img_array[:,:,1] * mask
         new_img_array[:,:,2] = new_img_array[:,:,2] * mask
         
@@ -156,11 +245,35 @@ def rmbg(json_path, img_path, save_path):
 def main():
     try:
         while True:
-            num = int(input("\n1. Start Data cropping\n2. End program\nEnter number: "))
-            if num == 2:
+            num = int(input("\n1. Split coco dataset\n2. JPG2PNG\n3. Data Cropping\n4. Quit\nEnter number: "))
+            if num == 4:
                 print("")
                 break
             elif num == 1:
+                json_path = input("\nEnter json path: ")       
+                json_list = os.listdir(json_path)
+                json_list = [file for file in json_list if file.endswith(".json")]
+                if json_list == []:
+                    print("No json files.")
+                    json_path = input("\nEnter json path: ")
+                    json_list = os.listdir(json_path)
+                    json_list = [file for file in json_list if file.endswith(".json")]
+                
+                save_json = input("Enter save json path: ")    
+                spcoco(json_path, json_list, save_json)
+            elif num == 2:
+                img_path = input("Enter image path: ")
+                img_list = os.listdir(img_path)
+                img_list = [file for file in img_list if file.endswith(".jpg")]
+                if img_list == []:
+                    print("No image files.")
+                    img_path = input("\nEnter image path: ")
+                    img_list = os.listdir(img_path)
+                    img_list = [file for file in img_list if file.endswith(".jpg")]
+  
+                save_img = input("Enter save image path: ")
+                jpg2png(img_path, img_list, save_img)
+            elif num == 3:
                 json_path = input("\nEnter json path: ")       
                 json_list = os.listdir(json_path)
                 json_list = [file for file in json_list if file.endswith(".json")]
@@ -192,6 +305,7 @@ def main():
         print("\nWrong input. Please enter only 1 or 2.")
     except OSError:
         print("\n Invalid input. Retry!")
+        
 if __name__ == "__main__":
     print("[2022 AI Data crop program]")
     main()
